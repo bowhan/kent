@@ -1,0 +1,97 @@
+PROCESS DESCRIPTION  (8/13 JK) added below
+TROUBLE-SHOOTING TIPS (8/17 JK) added below
+
+--------------------------------------------
+
+Here lies code to implement the ENCODE Big Data Warehouse (EDW).  The EDW is designed to track 
+a moderate number (1,000,000's) of big (>1GB) files.  It consists of three parts:
+1) A Linux file system with a fairly large block size.
+2) A MySQL database with a relatively small number of tables tracking
+    a) Users (by their email name - we rely on Persona for authentication)
+    b) Hubs (by their URLs)
+    c) Hosts (by their IP and connectivity)
+    d) Submits (by date/submitter/hub)
+    e) Files (by hub file name and EDW license plate).
+    f) Subscribers (jobs that get started when a file of a particular type arrives).
+    g) Results of automatic quality assurance results on files.
+3) A system to notify subscribers when a file has been received.
+Note the pipeline code is relatively separate.  The pipeline subscribes to the data warehouse.
+
+The schema for the database is in lib/encodeDataWarehouse.as. There is also a script lib/resetEdw
+that will delete the existing database and create a new one on the test site (hgwdev).  The programs
+that interact with the database directly are in C, and all start with the "edw" prefix.  Ones that
+work over the web start with the "edwWeb" prefix.  Arguably the most important program is edwSubmit.
+This program reads a manifest file that has been validated with validateManifest on the data 
+producer's machine.  This "validated.txt" file is on the data producer's web site,  as are all of
+the files it refers to.   The edwSubmit program transfers the files, updating the edwSubmit table
+with its progress,  and queues up jobs for the validation/quality assurance phase.  EdwSubmit can
+be run through the command line,  but more often is run indirectly from the web either interactively
+with the edwWebSubmit program,  or under script control with edwScriptSubmit.  These other two 
+programs add an item to the edwSubmitJob table,  and send a message to a Unix FIFO to wake up a
+edwRunDaemon.  The edwRunDaemon manages up to ~5 (the exact number is configurable) edwSubmit 
+processes running in parallel.  A separate edwRunDaemon manages up to ~10 validation/QA processes.
+
+Here is a brief description of the programs involved in this system, starting with the command
+line tools.
+
+edwAddAssembly - Add a new genome assembly to the database.
+edwAddQaEnrichTarget - Add a new enrichment target (like a set of exons or regulatory regions).
+edwAddSubscriber - Add a new subscriber who gets notified of new files.
+edwCreateUser - Add a new user who has database access.
+edwMakeEnrichments - Calculate coverage of enrichment targets vs. coverage of genome.
+edwMakeReplicateQa - Calculate overlap and correlation within overlap of replicates.
+edwMakeValidFile - Check format. Count up items and bases in data set, subsample fastqs and BAMS.
+edwMetaManiToTdb - From a manifest file and a little metadata create a trackDb.txt file.
+edwQaAgent - Little script that runs edwMakeValidFile, edwMakeEnrichments, edwMakeReplicateQa.
+edwReallyRemoveFiles - Remove files that were put in database by mistake.
+edwRunDaemon - Run jobs specified in a database table - either edwJob or edwSubmitJob.
+edwSubmit - Manages transfer of files into database and local file system.
+
+Here is a description of the web based tools. 
+edwScriptSubmit - Scripts can start edwSubmit with this tool using a https based web service.
+edwWebAuthLogin - Part of Persona authentication system.  See also edwPersona.js.
+edwWebAuthLogout - Part of Persona authentication system. Does not directly interact with user.
+edwWebBrowse - A user can log in and view status of all of his submissions with this.
+edwWebCreateUser - A user can grant access to a new user with this.
+edwWebRegisterScript - Scripts for submitting data need to be registered with this form.
+edwWebSubmit - Main interactive submit-a-dataset form.  Also monitors progress of one submission.
+
+Supporting these tools are the lib and inc dirs.  These just contain two modules - 
+encodeDataWarehouse which is autoSql generated from lib/encodeDataWarehouse.as,  and edwLib
+containing the hand-coded parts.
+
+
+PROCESS DESCRIPTION  (8/13 JK)
+-------------------------------
+1) User runs validateManifest to create a validated.txt file on their web site.
+2) User navigates to http://encodedcc.sdsc.edu/cgi-bin/edwWebSubmit and logs in.
+3) Log in causes exchange with Persona server that invokes edwWebAuthLogin on our side.
+4) User puts URL for their validated manifest in edwWebSubmit form and submits.
+5) edwWebSubmit writes a row to the edwSubmitJob table and sends a wake up signal to edwDaemon.
+6) edwDaemon starts up edwSubmit, keeping track of how long edwSubmit takes to run, and storing any stderr output in the stderr output of edwSubmitJob.
+7) edwSubmit downloads validated.txt.  It creates a edwSubmit table entry. Then it processes each file in the validated.txt sequentially.  It checks the MD5 sum on each file.   If the MD5 sum matches a file with the same name from the same directory,  that is in the warehouse it skips it, figuring it was already submitted.   Otherwise it makes an entry in the edwFIle table, and downloads the file using parallel connections.  It checks the MD5 sum. If there is a problem it will set an errorMessage in the edwFile table, and also in the edwSubmit table.When file is downloaded and the MD5 sum matches edwSubmit puts a row for 'edwQaAgent' in the edwJob table.  
+8) edwDaemon (another instance) notices edwQaAgent job, and starts it, capturing start/end times and stderr output.  This means the server side validation/automatic QA process typically starts as edwSubmit is working on downloading the next file.
+9) edwQaAgent is just a very small shell script that invokes the next four steps sequentially.
+10) edwMakeValidFile checks the file format really is what it is supposed to be, and for many file formats will gather statistics such as how many items covering how many bases are in the file.  This information goes into the edwValidFile table, along with the ENCODE license plate.  For fastq files additional information gets stored in the edwFastqFile table,  and a sample fastq containing just 250,000 reads is made.   These reads get aligned against the target genome to compute the mapRatio.  For fastq files, and files such as BAM and bigBed, that include genomic coordinates,  a sample of 250,000 items is turned into a simple (non-blocked) bed file for later use.  If there is an error during the edwMakeValidFile phase the edwValidFile table entry will not be made, and there will be a message posted on the edwFile errorMessage column.
+11) edwMakeEnrichment will take the sample bed files produced in step 10, and see where it lands relative to all the regions specified (as .bigBed files) in the edwQaEnrichTarget table for the relevant assembly. It puts the results in the edwQaEnrich table,  which will have one row for each file/target combination.
+12) edwMakeReplicateQa looks for any files that are in the database already with the same experiment and output type, but a different replicate.  For these it  uses the sample bed files from step 10 to make an entry in the edwQaPairSampleOverlap table (aka cross-splatter or cross-enrichment analysis).  For bigWig files instead of the cross-enrichment, it does correlations, putting the results in the edwQaPairCorrelation table.  These correlations are done genome wide, and also restricted to the regions specified as the target in the manifest.
+13) edwMakeContaminationQa runs only on fastq files.  It subsamples the 250,000 read sample down to 100,000 reads,  and aligns these against all organisms specified in the edwQaContamTarget table.  The mapRatio is that results is stored in the edwQaContam table, with one entry for each fastq file/target pair.
+14) edwMakeRepeatQa also runs only on fastq files.  (Potentially this could be extended to other files though.)  It aligns the 250,000 read sample against a RepeatMasker library for the organism,  and stores the results in the edwQaRepeat table.  This will have one entry for each major repeat class (LINE, SINE, tRNA, rRNA, etc) that gets hit by the sample, and includes what proportion of reads align to that major repeat class.
+
+
+TROUBLE_SHOOTING TIPS (8/17 JK)
+--------------------------------
+when troubleshooting the EDW,  the first thing to do is use 'ps' to determine if edwDaemons are running.  There should be at least 2:
+
+        kent      5727     1  0 Aug14 ?        00:00:00 edwRunDaemon encodeDataWarehouse edwSubmitJob 6 /data/www/userdata/edwSubmit.fifo -log=edwSubm
+        kent      5729     1  0 Aug14 ?        00:00:00 edwRunDaemon encodeDataWarehouse edwJob 12 /data/www/userdata/edwQaAgent.fifo -log=edwQaAgent.
+
+If not, go to:
+
+        production: /data/encode3/encodeDataWarehouse/etc
+        test: kent/src/hg/encode3/encodeDataWarehouse/lib
+
+and run
+        ./restartDaemons
+
+At this point they'll be restarted.  If the daemons are working, the next thing to do is look at the recent entries in the edwSubmit, edwSubmitJob and edwJob tables.   Look in the errorMessage and stderr fields.

@@ -1,0 +1,213 @@
+<!-- Display image in righthand corner -->
+<TABLE ALIGN=RIGHT BORDER=0 WIDTH=415>
+  <TR><TD ALIGN=RIGHT>
+    <A HREF="http://www.ncbi.nlm.nih.gov/genome/51" TARGET=_blank>
+    <IMG SRC="/images/human.jpg" WIDTH=275 HEIGHT=275 ALT="Human"></A>
+  </TD></TR>
+  <TR><TD ALIGN=RIGHT> 
+    <FONT SIZE=-1><em>Homo sapiens</em><BR> 
+    </FONT>
+    <FONT SIZE=-2> 
+      (<A HREF="http://www.cbse.ucsc.edu/"
+      TARGET=_blank>Graphic courtesy of CBSE</A>)
+    </FONT>
+  </TD></TR>
+</TABLE>
+
+<P>
+<B>UCSC Genome Browser assembly ID:</B> hg38<BR>
+<B>Sequencing/Assembly provider ID:</B> GRCh38 Genome Reference Consortium Human Reference 38 (GCA_000001405.2)<BR>
+<B>Assembly date:</B> Dec. 2013<BR>
+<B>GenBank accession ID:</B> GCA_000001305.2<BR>
+<B>NCBI Genome information:</B> <A HREF="http://www.ncbi.nlm.nih.gov/genome/51"
+TARGET="_blank">NCBI genome/51 (Homo sapiens)</A><BR>
+<B>NCBI Assembly information:</B>
+<A HREF="http://www.ncbi.nlm.nih.gov/assembly/883148"
+TARGET="_blank">NCBI assembly/883148 (GRCh38/GCA_000001405.2)</A><BR>
+<B>BioProject information:</B></I> <A HREF="http://www.ncbi.nlm.nih.gov/bioproject/31257"
+TARGET="_blank">NCBI Bioproject: 31257 TO BE CORRECTED</A>
+</P>
+<HR>
+<P>
+<B>Search the assembly:</B>
+<UL>
+<LI>
+<B>By position or search term: </B> Use the &quot;position or search term&quot;
+box to find areas of the genome associated with many different attributes, such
+as a specific chromosomal coordinate range; mRNA, EST, or STS marker names; or
+keywords from the GenBank description of an mRNA.
+<A HREF="../goldenPath/help/query.html">More information</A>, including sample
+queries.
+<LI>
+<B>By gene name: </B> Type a gene name into the &quot;search term&quot; box,
+choose your gene from the drop-down list, then press &quot;submit&quot; to go 
+directly to the assembly location associated with that gene.
+<A HREF="../goldenPath/help/geneSearchBox.html">More information</A>.
+<LI>
+<B>By track type: </B> Click the &quot;track search&quot; button
+to find Genome Browser tracks that match specific selection criteria.
+<A HREF="../goldenPath/help/trackSearch.html">More information</A>.
+</UL>
+</P>
+<HR>
+<P>
+<B>Download sequence and annotation data:</B>
+<UL>
+<LI><A HREF="ftp://hgdownload.cse.ucsc.edu/goldenPath/hg38/">Using FTP</A>
+(recommended)
+<LI><A HREF="http://hgdownload.cse.ucsc.edu/downloads.html#human">Using HTTP</A>
+<LI><A HREF="../goldenPath/credits.html#human_credits">Data use conditions and
+restrictions</A>
+<LI><A HREF="../goldenPath/credits.html#human_credits">Acknowledgments</A>
+</UL>
+</P>
+<hr>
+<h3>Assembly Details</h3>
+
+<p>
+With the release of GRCh38, in order to synchronize with the GRC assembly version numbering
+scheme, UCSC made the decision to name this assembly hg38 instead of hg20. For a glossary of
+assembly-related terms, please see the GRC
+<a href="http://www.ncbi.nlm.nih.gov/projects/genome/assembly/grc/info/definitions.shtml"
+target="_blank">Assembly Terminology</a> page. GRCh38 release notes page?
+</p>
+
+<p>
+<b>Centromeres</b><br>
+Insert centromerey stuff here...
+</p>
+
+<p>
+<b>IUPAC characters</b><br>
+In addition to A, C, G, T and N, the raw sequence files from NCBI also include additional IUPAC
+ambiguity codes for bases that could not be positively identified as A, C, G or T (see
+<a href="http://www.ncbi.nlm.nih.gov/Class/MLACourse/Modules/MolBioReview/iupac_nt_abbreviations.html"
+target="_blank">NCBI</a>
+or
+<a href="http://www.bioinformatics.org/sms/iupac.html" target="_blank">bioinformatics.org</a>
+or
+<a href="http://en.wikipedia.org/wiki/Nucleic_acid_notation" target="_blank">Wikipedia</a>
+for more information) (***WE SHOULD CHOOSE ONE OF THESE REFERENCES***). As part of the UCSC
+assembly creation process, these IUPAC characters are converted to N's, so the FASTA files
+available for download from UCSC contain N's instead of the original IUPAC characters. For
+FASTA files containing these IUPAC characters, the raw data files are available for download
+from the NCBI
+<a href="ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38"
+target="_blank">FTP site</a>.
+</p>
+
+<p>
+List IUPAC character statistics?
+</p>
+
+<p>
+<b>Note on chrM</b><br>
+The hg19 assembly was released with the mitochondrion sequence (represented as &quot;chrM&quot;
+in the Genome Browser) contained in GenBank record NC_001807. After the release of hg19, the
+mitochondrion sequence in NC_001807 was replaced with record
+<a href="http://www.ncbi.nlm.nih.gov/nuccore/NC_012920" target="_blank">NC_012920</a>,
+though the hg19 assembly was not updated to reflect this change. The hg38 assembly now
+includes this newer mitochondrion sequence. Please see the
+<a href="http://mitomap.org/bin/view.pl/MITOMAP/HumanMitoSeq" target="_blank">Revised Cambridge
+Reference Sequence (rCRS)</a> page for more information.
+</p>
+
+<p>
+<b>Chromosome naming scheme</b><br>
+With the release of hg38, there has been a slight change to the UCSC chromosome naming scheme:
+<ul>
+  <li>Haplotype chromosome, unplaced contig and unlocalized contig names now include
+      their NCBI accession number (e.g., chr6_GL000256v2_alt)</li>
+  <li>The &quot;v2&quot; at the end of the accession number indicates the NCBI version number</li>
+  <li>Haplotype chromosome names consist of the chromosome number, followed by the NCBI accession
+      number, followed by &quot;alt&quot;</li>
+  <li>Unplaced contig names consist of the chromosome number, followed by the NCBI accession
+      number, followed by &quot;random&quot;</li>
+  <li>Unlocalized contig names (contigs whose associated chromosome is not known) consist of
+      &quot;chrUn&quot; followed by the NCBI accession number</li>
+</ul>
+</p>
+
+<p>
+Some assembly statistics:
+</p>
+
+<p>
+<TABLE BORDER=1 CELLPADDING=3>
+<TR>
+    <TH>number</TH><TH>haplotypes</TH><TH WIDTH=85>unplaced contigs</TH><TH WIDTH=30></TH>
+    <TH>number</TH><TH>haplotypes</TH><TH WIDTH=85>unplaced contigs</TH><TH WIDTH=30></TH>
+    <TH>number</TH><TH>haplotypes</TH><TH WIDTH=85>unplaced contigs</TH>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr1</TD><TD ALIGN="CENTER">12</TD><TD ALIGN="CENTER">9</TD><TD></TD>
+    <TD ALIGN="CENTER">chr10</TD><TD ALIGN="CENTER">4</TD><TD ALIGN="CENTER">0</TD><TD></TD>
+    <TD ALIGN="CENTER">chr18</TD><TD ALIGN="CENTER">10</TD><TD ALIGN="CENTER">0</TD>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr2</TD><TD ALIGN="CENTER">15</TD><TD ALIGN="CENTER">2</TD><TD></TD>
+    <TD ALIGN="CENTER">chr11</TD><TD ALIGN="CENTER">12</TD><TD ALIGN="CENTER">1</TD><TD></TD>
+    <TD ALIGN="CENTER">chr19</TD><TD ALIGN="CENTER">43</TD><TD ALIGN="CENTER">0</TD>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr3</TD><TD ALIGN="CENTER">16</TD><TD ALIGN="CENTER">1</TD><TD></TD>
+    <TD ALIGN="CENTER">chr12</TD><TD ALIGN="CENTER">13</TD><TD ALIGN="CENTER">0</TD><TD></TD>
+    <TD ALIGN="CENTER">chr20</TD><TD ALIGN="CENTER">4</TD><TD ALIGN="CENTER">0</TD>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr4</TD><TD ALIGN="CENTER">11</TD><TD ALIGN="CENTER">1</TD><TD></TD>
+    <TD ALIGN="CENTER">chr13</TD><TD ALIGN="CENTER">6</TD><TD ALIGN="CENTER">0</TD><TD></TD>
+    <TD ALIGN="CENTER">chr21</TD><TD ALIGN="CENTER">7</TD><TD ALIGN="CENTER">0</TD>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr5</TD><TD ALIGN="CENTER">13</TD><TD ALIGN="CENTER">1</TD><TD></TD>
+    <TD ALIGN="CENTER">chr14</TD><TD ALIGN="CENTER">4</TD><TD ALIGN="CENTER">8</TD><TD></TD>
+    <TD ALIGN="CENTER">chr22</TD><TD ALIGN="CENTER">9</TD><TD ALIGN="CENTER">9</TD>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr6</TD><TD ALIGN="CENTER">16</TD><TD ALIGN="CENTER">0</TD><TD></TD>
+    <TD ALIGN="CENTER">chr15</TD><TD ALIGN="CENTER">9</TD><TD ALIGN="CENTER">1</TD><TD></TD>
+    <TD ALIGN="CENTER">chrX</TD><TD ALIGN="CENTER">3</TD><TD ALIGN="CENTER">0</TD>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr7</TD><TD ALIGN="CENTER">9</TD><TD ALIGN="CENTER">0</TD><TD></TD>
+    <TD ALIGN="CENTER">chr16</TD><TD ALIGN="CENTER">6</TD><TD ALIGN="CENTER">1</TD><TD></TD>
+    <TD ALIGN="CENTER">chrY</TD><TD ALIGN="CENTER">0</TD><TD ALIGN="CENTER">1</TD>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr8</TD><TD ALIGN="CENTER">16</TD><TD ALIGN="CENTER">0</TD><TD></TD>
+    <TD ALIGN="CENTER">chr17</TD><TD ALIGN="CENTER">18</TD><TD ALIGN="CENTER">3</TD><TD></TD>
+    <TD ALIGN="CENTER">chrM</TD><TD ALIGN="CENTER">0</TD><TD ALIGN="CENTER">0</TD>
+</TR>
+<TR>
+    <TD ALIGN="CENTER">chr9</TD><TD ALIGN="CENTER">5</TD><TD ALIGN="CENTER">4</TD></TR>
+</TABLE>
+</p>
+
+<p>
+<TABLE BORDER=1 CELLPADDING=3>
+    <TH ALIGN="LEFT">Type</TH><TH WIDTH=50>Total</TH>
+    <TR><TD>chromosomes</TD><TD ALIGN="CENTER">25</TD></TR>
+    <TR><TD>haplotypes</TD><TD ALIGN="CENTER">261</TD></TR>
+    <TR><TD>unplaced contigs</TD><TD ALIGN="CENTER">42</TD></TR>
+    <TR><TD>unlocalized contigs</TD><TD ALIGN="CENTER">127</TD></TR>
+    <TR><TD></TD><TD></TD></TR>
+    <TR><TD><B>Total</B></TD><TD ALIGN="CENTER">455</TD></TR>
+</TABLE>
+</p>
+
+<p>
+See the <a href="../cgi-bin/hgTracks?chromInfoPage=">sequences</a> page for a complete
+list of hg38 chromosome names.
+</p>
+
+<p>
+<b>Pseudoautosomal regions</b><br>
+The Y chromosome in this assembly contains two pseudoautosomal regions (PARs)
+that were taken from the corresponding regions in the X chromosome and are
+exact duplicates:
+<blockquote>
+chrY:10,000-2,781,479 and chrY:56,887,902-57,217,415
+<br>chrX:10,000-2,781,479 and chrX:155,701,382-156,030,895
+</blockquote>
+</p>
