@@ -1,5 +1,8 @@
 /* bedItemOverlapCount - count how many times a base is overlapped in a
 	bed file */
+
+/* this code has been modified and used in the pipipe package to efficiently convert bed2 format to bedgraph */
+
 #include "common.h"
 #include "options.h"
 #include "linefile.h"
@@ -51,12 +54,14 @@ void usage()
 /* Explain usage and exit. */
 {
 errAbort(
+  "\e[31;40mWarning: this is a modified version and should only be used in the pipipe package"
+  "bed2: chrom  start  end  number_of_time_sequenced  number_of_time_mapped  strand\e[0m"
   "bedItemOverlapCount - count number of times a base is overlapped by the\n"
-  "\titems in a bed file.  Output is bedGraph 4 to stdout.\n"
+  "\titems in a bed2 file.  Output is bedGraph 4 to stdout.\n"
   "usage:\n"
-  " sort bedFile.bed | bedItemOverlapCount [options] <database> stdin\n"
+  " sort bedFile.bed2 | bedItemOverlapCount [options] <database> stdin\n"
   "To create a bigWig file from this data to use in a custom track:\n"
-  " sort -k1,1 bedFile.bed | bedItemOverlapCount [options] <database> stdin \\\n"
+  " sort -k1,1 bedFile.bed2 | bedItemOverlapCount [options] <database> stdin \\\n"
   "         > bedFile.bedGraph\n"
   " bedGraphToBigWig bedFile.bedGraph chrom.sizes bedFile.bw\n"
   "   where the chrom.sizes is obtained with the script: fetchChromSizes\n"
@@ -145,7 +150,8 @@ if (doOutBounds)
     }
 
 int ii;
-int prevValue = counts[0];
+//int prevValue = counts[0];
+unitSize prevValue = counts[0];
 int startPoint = 0;
 for(ii=1; ii < size; ii++)
     {
@@ -159,14 +165,15 @@ for(ii=1; ii < size; ii++)
     if (counts[ii] != prevValue)
 	{
 	if (doZero || (prevValue != 0))
-	    printf("%s\t%u\t%u\t%u\n", chrom, startPoint, ii, prevValue);
+		printf("%s\t%u\t%u\t%Lf\n", chrom, startPoint, ii, prevValue);
+	   /// printf("%s\t%u\t%u\t%u\n", chrom, startPoint, ii, prevValue);
 	startPoint = ii;
 	prevValue = counts[ii];
 	}
     }
 
 if (doZero || (prevValue != 0))
-    printf("%s\t%u\t%u\t%u\n", chrom, startPoint, ii, prevValue);
+    printf("%s\t%u\t%u\t%Lf\n", chrom, startPoint, ii, prevValue);/// modified
 }
 
 static void bedItemOverlapCount(char *database, int fileCount, char *fileList[])
@@ -215,15 +222,23 @@ for (i=0; i<fileCount; ++i)
     struct lineFile *bf = lineFileOpen(fileList[i] , TRUE);
     struct bed *bed = (struct bed *)NULL;
     char *row[12];
-    int numFields = doBed12 ? 12 : 3;
-
+//    int numFields = doBed12 ? 12 : 3;
+    int numFields = doBed12 ? 12 : 5;
     while (lineFileNextRow(bf,row, numFields))
 	{
 	int i;
 	bed = bedLoadN(row, numFields);
-
-	verbose(3,"#\t%s\t%d\t%d\n",bed->chrom,bed->chromStart, bed->chromEnd);
-
+/// accecpting NOR and NTM
+	char * _pEND;
+	unitSize _reads = strtold (bed->name, &_pEND);
+	if (_reads == 0.0L)
+	{
+		printf ("[pipipe] Failed to finish converting col 4 to long double\n");
+		exit; // FIXME: need to release resource
+	}
+	int _ntm = bed->score;
+	unitSize _weight = _reads/_ntm;
+/// done
 	if (prevChrom && differentWord(bed->chrom,prevChrom)) // End a chr
 	    {
 	    verbose(2,"#\tchrom %s done, size %d\n", prevChrom, chromSize);
@@ -259,11 +274,11 @@ for (i=0; i<fileCount; ++i)
 		}
 
 	    for (i = bed->chromStart; i < chromSize; ++i)
-		INCWOVERFLOW(counts,i);
+		INCWOVERFLOW(counts,i, _weight); ///
 	    for (i = 0; i < (bed->chromEnd - chromSize); ++i)
-		INCWOVERFLOW(counts,i);
+		INCWOVERFLOW(counts,i, _weight); ///
 	    }
-	else if (doBed12)
+	else if (doBed12) /// for bed12... pipipe will not call this version on bed12
 	    {
 	    int *starts = bed->chromStarts;
 	    int *sizes = bed->blockSizes;
@@ -273,22 +288,20 @@ for (i=0; i<fileCount; ++i)
 		{
 		unsigned int end = *starts + *sizes + bed->chromStart;
 		for (i = *starts + bed->chromStart; i < end; ++i)
-		    INCWOVERFLOW(counts,i);
+		    INCWOVERFLOW(counts,i, _weight); ///
 		}
 	    }
-	else
+	else /// the block of code we care
 	    {
 	    for (i = bed->chromStart; i < bed->chromEnd; ++i)
-		INCWOVERFLOW(counts, i);
+		INCWOVERFLOW(counts, i, _weight); ///
 	    }
 	outputToDo = TRUE;
 	bedFree(&bed); // plug the memory leak
 	}
-
     lineFileClose(&bf);
     // Note, next file could be on same chr!
     }
-
 if (outputToDo)
     outputCounts(counts, prevChrom, chromSize);
 
