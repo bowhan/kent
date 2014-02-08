@@ -18,11 +18,11 @@
 
 /* define unitSize to be a larger storage class if your counts
  * are overflowing. */
-typedef unsigned int unitSize;
-
+///typedef unsigned int unitSize;
+typedef long double unitSize;
 #define MAXCOUNT (unitSize)~0
 #define MAXMESSAGE "Overflow of overlap counts. Max is %lu.  Recompile with bigger unitSize or use -max option"
-#define INCWOVERFLOW(countArray,x) if(countArray[x] == MAXCOUNT) {if(!doMax) errAbort(MAXMESSAGE,(unsigned long)MAXCOUNT);} else countArray[x]++
+#define INCWOVERFLOW(countArray,x, y) if(countArray[x] == MAXCOUNT) {if(!doMax) errAbort(MAXMESSAGE,(unsigned long)MAXCOUNT);} else countArray[x]+=y /// not just increment one, could be a double
 
 /* Command line switches. */
 static struct hash *chromHash = NULL;

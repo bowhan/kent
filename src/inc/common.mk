@@ -1,7 +1,7 @@
 CC=gcc
 # to build on sundance: CC=gcc -mcpu=v9 -m64
 ifeq (${COPT},)
-    COPT=-O -g
+    COPT=-O -g -static
 endif
 ifeq (${CFLAGS},)
     CFLAGS=
